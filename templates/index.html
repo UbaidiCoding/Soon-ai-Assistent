@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soon- Virtual Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ff41;
+            --secondary: #0d0208;
+            --accent: #008f11;
+            --dark: #003b00;
+            --light: #00d700;
+            --glow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: var(--secondary);
+            color: var(--primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 63, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 63, 0, 0.1) 0%, transparent 20%),
+                linear-gradient(to bottom, #001a00, #000);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            box-shadow: var(--glow);
+            z-index: 1000;
+            animation: scan 4s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--accent);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            text-shadow: var(--glow);
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: var(--glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon::before {
+            content: ">";
+            font-size: 40px;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .developer-info {
+            text-align: right;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .developer-info .name {
+            font-weight: bold;
+            color: var(--light);
+            text-shadow: var(--glow);
+        }
+        
+        .search-container {
+            background: rgba(0, 30, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid var(--dark);
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        
+        .search-container input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 1.1rem;
+            padding: 8px 15px;
+            outline: none;
+        }
+        
+        .search-container button {
+            background: var(--dark);
+            color: var(--primary);
+            border: 1px solid var(--accent);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-container button:hover {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        /* Main Content */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            flex: 1;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: rgba(0, 20, 0, 0.7);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            border-bottom: 1px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--light);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .modules {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .module {
+            background: rgba(0, 30, 0, 0.5);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .module:hover {
+            background: rgba(0, 40, 0, 0.7);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .module i {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        
+        .module.active {
+            background: rgba(0, 50, 0, 0.8);
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 20, 0, 0.7);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+        
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 15, 0, 0.8);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 15px 20px;
+            border-radius: 10px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.5;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: rgba(0, 80, 0, 0.4);
+            border: 1px solid var(--accent);
+        }
+        
+        .assistant-message {
+            align-self: flex-start;
+            background: rgba(0, 40, 0, 0.4);
+            border: 1px solid var(--dark);
+        }
+        
+        .message-time {
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--accent);
+            background: rgba(0, 15, 0, 0.8);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 20px;
+            background: rgba(0, 30, 0, 0.7);
+            border: 1px solid var(--dark);
+            border-radius: 30px;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        .mic-btn {
+            background: var(--dark);
+            color: var(--primary);
+            border: 1px solid var(--accent);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .mic-btn:hover {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        .mic-btn.listening {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+        }
+        
+        /* Task Manager */
+        .tasks-container {
+            background: rgba(0, 20, 0, 0.7);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .task-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+        
+        .task-item {
+            background: rgba(0, 30, 0, 0.5);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .task-text {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .task-actions button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .task-actions button:hover {
+            background: rgba(0, 50, 0, 0.7);
+            color: var(--primary);
+        }
+        
+        .add-task-form {
+            display: flex;
+            margin-top: auto;
+            gap: 10px;
+        }
+        
+        .add-task-form input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(0, 30, 0, 0.7);
+            border: 1px solid var(--dark);
+            border-radius: 6px;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        
+        .add-task-form button {
+            background: var(--dark);
+            color: var(--primary);
+            border: 1px solid var(--accent);
+            width: 45px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-top: 1px solid var(--accent);
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+        
+        .system-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .time-info {
+            text-align: right;
+        }
+        
+        /* Animations */
+        .glow-text {
+            text-shadow: var(--glow);
+        }
+        
+        .terminal-text {
+            position: relative;
+        }
+        
+        .terminal-text::after {
+            content: "|";
+            animation: blink 1s infinite;
+            position: absolute;
+            right: -10px;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .sidebar, .tasks-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <h1>Soon</h1>
+            </div>
+            <div class="developer-info">
+                <p>Developed by: <span class="name">SamiUbaidi</span></p>
+                <p>aka Samejo | codewithsamiubaidi</p>
+            </div>
+        </header>
+        
+        <div class="search-container">
+            <input type="text" id="global-search" placeholder="Search the web, Wikipedia, or your tasks...">
+            <button id="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <div class="dashboard">
+            <div class="sidebar">
+                <h3 class="section-title">MODULES</h3>
+                <div class="modules">
+                    <div class="module active" data-module="chat">
+                        <i class="fas fa-comments"></i>
+                        <h4>Chat</h4>
+                    </div>
+                    <div class="module" data-module="tasks">
+                        <i class="fas fa-tasks"></i>
+                        <h4>Tasks</h4>
+                    </div>
+                    <div class="module" data-module="reminders">
+                        <i class="fas fa-clock"></i>
+                        <h4>Reminders</h4>
+                    </div>
+                    <div class="module" data-module="websearch">
+                        <i class="fas fa-globe"></i>
+                        <h4>Web Search</h4>
+                    </div>
+                    <div class="module" data-module="wiki">
+                        <i class="fas fa-book"></i>
+                        <h4>Wikipedia</h4>
+                    </div>
+                    <div class="module" data-module="email">
+                        <i class="fas fa-envelope"></i>
+                        <h4>Email</h4>
+                    </div>
+                    <div class="module" data-module="stt-tts">
+                        <i class="fas fa-microphone-alt"></i>
+                        <h4>Speech Tools</h4>
+                    </div>
+                    <div class="module" data-module="github">
+                        <i class="fab fa-github"></i>
+                        <h4>GitHub</h4>
+                    </div>
+                    <div class="module" data-module="fun">
+                        <i class="fas fa-laugh"></i>
+                        <h4>Jokes & Fun</h4>
+                    </div>
+                    <div class="module" data-module="media">
+                        <i class="fas fa-play-circle"></i>
+                        <h4>Media Player</h4>
+                    </div>
+                    <div class="module" data-module="settings">
+                        <i class="fas fa-cog"></i>
+                        <h4>Settings</h4>
+                    </div>
+                    <div class="module" data-module="hacker">
+                        <i class="fas fa-terminal"></i>
+                        <h4>Hacker Mode</h4>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">SYSTEM STATUS</h3>
+                <div class="status-info">
+                    <div class="status-item">
+                        <span>CPU Usage:</span>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 45%;"></div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span>Memory:</span>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span>Network:</span>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 30%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>VIRTUAL ASSISTANT</h3>
+                    <div class="status">Status: <span class="glow-text">Online</span></div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message assistant-message">
+                        <p>Hello! I'm Soon, your virtual assistant.</p>
+                        <p>I can help you with tasks, reminders, web searches, emails, and more!</p>
+                        <div class="message-time">Soon • Just now</div>
+                    </div>
+                    <div class="message assistant-message">
+                        <p>Try saying:</p>
+                        <p>• "Set a reminder for tomorrow"</p>
+                        <p>• "Search for Python tutorials"</p>
+                        <p>• "Tell me a joke"</p>
+                        <div class="message-time">Soon • Just now</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="user-input" placeholder="Type your command or question...">
+                    <div class="mic-btn" id="mic-btn">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tasks-container">
+                <h3 class="section-title">TASK MANAGER</h3>
+                <div class="task-list" id="task-list">
+                    <div class="task-item">
+                        <div class="task-text">Complete Soon assistant project</div>
+                        <div class="task-actions">
+                            <button title="Complete"><i class="fas fa-check"></i></button>
+                            <button title="Edit"><i class="fas fa-edit"></i></button>
+                            <button title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="task-item completed">
+                        <div class="task-text">Design UI interface</div>
+                        <div class="task-actions">
+                            <button title="Complete"><i class="fas fa-check"></i></button>
+                            <button title="Edit"><i class="fas fa-edit"></i></button>
+                            <button title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-text">Implement speech recognition</div>
+                        <div class="task-actions">
+                            <button title="Complete"><i class="fas fa-check"></i></button>
+                            <button title="Edit"><i class="fas fa-edit"></i></button>
+                            <button title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-text">Add web search functionality</div>
+                        <div class="task-actions">
+                            <button title="Complete"><i class="fas fa-check"></i></button>
+                            <button title="Edit"><i class="fas fa-edit"></i></button>
+                            <button title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-text">Test reminder system</div>
+                        <div class="task-actions">
+                            <button title="Complete"><i class="fas fa-check"></i></button>
+                            <button title="Edit"><i class="fas fa-edit"></i></button>
+                            <button title="Delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-task-form">
+                    <input type="text" id="new-task" placeholder="Add new task...">
+                    <button id="add-task-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="system-info">
+                <div>Soon v2.0</div>
+                <div>Developer: <span class="glow-text">SamiUbaidi</span></div>
+                <div>GitHub: <span class="glow-text">codewithsamiubaidi</span></div>
+            </div>
+            <div class="time-info">
+                System Time: <span id="current-time">00:00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const userInput = document.getElementById('user-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const micBtn = document.getElementById('mic-btn');
+        const modules = document.querySelectorAll('.module');
+        const currentTime = document.getElementById('current-time');
+        const taskList = document.getElementById('task-list');
+        const newTaskInput = document.getElementById('new-task');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const globalSearch = document.getElementById('global-search');
+        const searchBtn = document.getElementById('search-btn');
+        
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            currentTime.textContent = timeString;
+        }
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Module switching
+        modules.forEach(module => {
+            module.addEventListener('click', () => {
+                modules.forEach(m => m.classList.remove('active'));
+                module.classList.add('active');
+                
+                // Show module name in chat
+                const moduleName = module.querySelector('h4').textContent;
+                addMessage(`Switched to ${moduleName} module. How can I assist you?`, 'assistant');
+            });
+        });
+        
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            
+            const messageContent = document.createElement('p');
+            messageContent.textContent = text;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const messageTime = document.createElement('div');
+            messageTime.classList.add('message-time');
+            messageTime.textContent = `${sender === 'user' ? 'You' : 'Soon'} • ${timeString}`;
+            
+            messageDiv.appendChild(messageContent);
+            messageDiv.appendChild(messageTime);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Process user commands
+        function processCommand(command) {
+            // Convert to lowercase for easier matching
+            const cmd = command.toLowerCase();
+            
+            // Simulate thinking delay
+            setTimeout(() => {
+                let response = "I'm still learning. Can you rephrase that?";
+                
+                if (cmd.includes('hello') || cmd.includes('hi') || cmd.includes('hey')) {
+                    response = "Hello! How can I assist you today?";
+                } else if (cmd.includes('time')) {
+                    response = `The current time is ${new Date().toLocaleTimeString()}.`;
+                } else if (cmd.includes('date')) {
+                    response = `Today is ${new Date().toDateString()}.`;
+                } else if (cmd.includes('joke')) {
+                    const jokes = [
+                        "Why don't scientists trust atoms? Because they make up everything!",
+                        "Why did the scarecrow win an award? Because he was outstanding in his field!",
+                        "What do you call a fake noodle? An impasta!",
+                        "Why couldn't the bicycle stand up by itself? It was two tired!",
+                        "How does a penguin build its house? Igloos it together!"
+                    ];
+                    response = jokes[Math.floor(Math.random() * jokes.length)];
+                } else if (cmd.includes('search') || cmd.includes('google') || cmd.includes('duckduckgo')) {
+                    const query = command.replace('search', '').replace('google', '').trim();
+                    response = `Searching the web for: "${query}". Here are the top results...`;
+                    
+                    // Simulate search results
+                    setTimeout(() => {
+                        addMessage(`1. ${query} - Official Website\n2. ${query} on Wikipedia\n3. ${query} Tutorials\n4. Latest news about ${query}`, 'assistant');
+                    }, 1500);
+                } else if (cmd.includes('wiki')) {
+                    const query = command.replace('wiki', '').trim();
+                    response = `Searching Wikipedia for: "${query}". Here's what I found...`;
+                    
+                    // Simulate Wikipedia response
+                    setTimeout(() => {
+                        addMessage(`According to Wikipedia: ${query} is a fascinating topic with a rich history dating back centuries. It has influenced many aspects of modern technology and culture.`, 'assistant');
+                    }, 2000);
+                } else if (cmd.includes('remind') || cmd.includes('reminder')) {
+                    const timeMatch = cmd.match(/\d+/);
+                    const time = timeMatch ? timeMatch[0] : '30';
+                    response = `I've set a reminder for ${time} minutes from now. I'll notify you when it's time!`;
+                } else if (cmd.includes('email')) {
+                    if (cmd.includes('read')) {
+                        response = "Here are your latest emails:\n1. Newsletter from Python Weekly\n2. Security alert from GitHub\n3. Meeting invitation for Friday";
+                    } else if (cmd.includes('write') || cmd.includes('compose')) {
+                        response = "Opening email composer. Who would you like to email?";
+                    } else {
+                        response = "Would you like to read or write emails?";
+                    }
+                } else if (cmd.includes('github')) {
+                    response = "Opening GitHub tools. You can manage repositories here.";
+                } else if (cmd.includes('play') && (cmd.includes('song') || cmd.includes('music'))) {
+                    response = "Now playing your requested audio. Enjoy the music!";
+                } else if (cmd.includes('task') || cmd.includes('todo')) {
+                    if (cmd.includes('add') || cmd.includes('create')) {
+                        const task = command.replace('add', '').replace('task', '').replace('create', '').trim();
+                        if (task) {
+                            addTaskToList(task);
+                            response = `Task added: "${task}"`;
+                        } else {
+                            response = "Please specify a task to add.";
+                        }
+                    } else if (cmd.includes('list') || cmd.includes('show')) {
+                        response = "Here are your current tasks:\n1. Complete Soon assistant\n2. Implement speech recognition\n3. Add web search functionality";
+                    } else {
+                        response = "Do you want to add, list, or complete a task?";
+                    }
+                } else if (cmd.includes('thank')) {
+                    response = "You're welcome! Is there anything else I can help with?";
+                }
+                
+                addMessage(response, 'assistant');
+            }, 1000);
+        }
+        
+        // Add task to list
+        function addTaskToList(taskText) {
+            const taskItem = document.createElement('div');
+            taskItem.classList.add('task-item');
+            
+            const taskTextElem = document.createElement('div');
+            taskTextElem.classList.add('task-text');
+            taskTextElem.textContent = taskText;
+            
+            const taskActions = document.createElement('div');
+            taskActions.classList.add('task-actions');
+            
+            const completeBtn = document.createElement('button');
+            completeBtn.title = "Complete";
+            completeBtn.innerHTML = '<i class="fas fa-check"></i>';
+            completeBtn.addEventListener('click', () => {
+                taskItem.classList.toggle('completed');
+            });
+            
+            const editBtn = document.createElement('button');
+            editBtn.title = "Edit";
+            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+            editBtn.addEventListener('click', () => {
+                const newText = prompt("Edit task:", taskTextElem.textContent);
+                if (newText) {
+                    taskTextElem.textContent = newText;
+                }
+            });
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.title = "Delete";
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.addEventListener('click', () => {
+                taskItem.remove();
+            });
+            
+            taskActions.appendChild(completeBtn);
+            taskActions.appendChild(editBtn);
+            taskActions.appendChild(deleteBtn);
+            
+            taskItem.appendChild(taskTextElem);
+            taskItem.appendChild(taskActions);
+            
+            taskList.prepend(taskItem);
+            newTaskInput.value = '';
+        }
+        
+        // Speech recognition simulation
+        let isListening = false;
+        
+        micBtn.addEventListener('click', () => {
+            isListening = !isListening;
+            
+            if (isListening) {
+                micBtn.classList.add('listening');
+                micBtn.innerHTML = '<i class="fas fa-circle"></i>';
+                addMessage("Listening... Speak now", 'assistant');
+                
+                // Simulate speech recognition after 3 seconds
+                setTimeout(() => {
+                    const sampleCommands = [
+                        "Set a reminder for 30 minutes",
+                        "Search for Python tutorials",
+                        "Add task: Complete documentation",
+                        "Tell me a joke",
+                        "What time is it?"
+                    ];
+                    
+                    const randomCommand = sampleCommands[Math.floor(Math.random() * sampleCommands.length)];
+                    userInput.value = randomCommand;
+                    
+                    micBtn.classList.remove('listening');
+                    micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    isListening = false;
+                    
+                    // Process the command
+                    addMessage(randomCommand, 'user');
+                    processCommand(randomCommand);
+                }, 3000);
+            } else {
+                micBtn.classList.remove('listening');
+                micBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                addMessage("Listening stopped", 'assistant');
+            }
+        });
+        
+        // Send message function
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = userInput.value.trim();
+                if (!message) return;
+                
+                addMessage(message, 'user');
+                processCommand(message);
+                
+                userInput.value = '';
+            }
+        });
+        
+        // Add new task
+        addTaskBtn.addEventListener('click', () => {
+            const taskText = newTaskInput.value.trim();
+            if (taskText) {
+                addTaskToList(taskText);
+                addMessage(`Task added: "${taskText}"`, 'assistant');
+            }
+        });
+        
+        newTaskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTaskBtn.click();
+            }
+        });
+        
+        // Global search
+        searchBtn.addEventListener('click', () => {
+            const query = globalSearch.value.trim();
+            if (query) {
+                addMessage(`Searching for: "${query}"`, 'assistant');
+                processCommand(`search ${query}`);
+            }
+        });
+        
+        globalSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+        
+        // Initial assistant greeting
+        setTimeout(() => {
+            addMessage("System initialized. All modules are online and ready.", 'assistant');
+        }, 1000);
+    </script>
+</body>
+</html>
